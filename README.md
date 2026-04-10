@@ -1,36 +1,158 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TaskFlow AI
 
-## Getting Started
+An AI-powered task execution system that converts user intent into structured, multi-step actionable outputs using Oxlo AI APIs. 
 
-First, run the development server:
+This is NOT a chatbot—it behaves as an intent → planning → execution engine that returns structured, programmatically-consumable outputs.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Problem
+General chat models return unstructured conversation blocks, making it difficult to parse and use outputs programmatically. Chat interfaces don't enforce output schemas.
+
+## Solution
+TaskFlow AI implements a 3-step AI pipeline that:
+1. **Intent Detection** - Classifies user intent and extracts relevant entities
+2. **Task Planning** - Generates logically-ordered intermediate steps
+3. **Structured Output Generation** - Orchestrates execution and returns validated JSON
+
+This pattern behaves like an agentic system, not a generic chatbot, with deterministic, consumable outputs.
+
+## Architecture
+
+```
+ User Input ("Plan my Saturday")
+     │
+     ▼
+[ Intent Detection ] ──▶ Classifies intent, extracts entities
+     │
+     ▼
+[ Task Planning ]    ──▶ Generates step-by-step execution plan
+     │
+     ▼
+[ Execution ]        ──▶ Orchestrates completion & returns structured JSON
+     │
+     ▼
+Structured Output (Title + Sections) → UI Rendering
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tech Stack
+- **Next.js 14+** (App Router, Server/Client Components)
+- **React** (Frontend interactivity)
+- **TailwindCSS** (Modern UI styling)
+- **Lucide React** (Icons)
+- **Oxlo AI APIs** (LLM calls for pipeline steps)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Setup Instructions
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1. Prerequisites
+- Node.js 18+ 
+- npm or yarn
 
-## Learn More
+### 2. Installation
+```bash
+cd taskflow-next
+npm install
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 3. Environment Configuration
+```bash
+cp .env.example .env.local
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Edit `.env.local` and add your Oxlo API key:
+```
+OXLO_API_KEY=your_oxlo_api_key_here
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 4. Run Development Server
+```bash
+npm run dev
+```
 
-## Deploy on Vercel
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Features
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+✅ **3-Step AI Pipeline** - Intent detection, planning, and structured execution  
+✅ **Animated Step Progress** - Real-time UI feedback during execution  
+✅ **Structured Output** - Returns validated JSON with title and sections  
+✅ **Graceful Fallback** - Mock responses if API key missing (for testing UI)  
+✅ **Responsive Design** - Mobile and desktop support  
+✅ **Dark Mode** - Modern dark UI with emerald/cyan accent colors  
+✅ **Example Prompts** - Pre-filled intent examples for quick testing  
+
+## API Response Format
+
+```json
+{
+  "steps": [
+    "Understanding intent...",
+    "Planning tasks...",
+    "Generating output..."
+  ],
+  "result": {
+    "title": "Generated Task Title",
+    "sections": [
+      {
+        "heading": "Section Name",
+        "content": ["point1", "point2", "point3"]
+      }
+    ]
+  },
+  "meta": {
+    "api_calls": 3,
+    "execution_time": "2.15 sec"
+  }
+}
+```
+
+## File Structure
+
+```
+taskflow-next/
+├── app/
+│   ├── api/
+│   │   └── execute/
+│   │       └── route.js         # POST /api/execute - Main pipeline
+│   ├── layout.tsx              # Root layout
+│   ├── page.js                 # Main UI component
+│   ├── globals.css             # Global styles
+│   └── favicon.ico
+├── lib/
+│   └── oxlo.js                 # Oxlo API integration
+├── public/                     # Static assets
+├── .env.example               # Environment template
+├── .env.local                 # Your secrets (not in git)
+├── package.json               # Dependencies
+├── tailwind.config.ts         # Tailwind theming
+├── next.config.mjs            # Next.js config
+└── README.md                  # This file
+```
+
+## Usage Examples
+
+### Plan my Saturday
+Input: "Plan my Saturday with outdoor activities"
+
+Returns: Structured plan with morning, afternoon, evening activities
+
+### Learn Golang
+Input: "Learn Golang in 30 days syllabus"
+
+Returns: Week-by-week learning path with concepts and projects
+
+### YouTube Channel
+Input: "Start a YouTube channel step-by-step"
+
+Returns: Pre-production, equipment setup, content creation roadmap
+
+## Fallback Behavior
+
+If `OXLO_API_KEY` is not set in `.env.local`, the API gracefully returns a mock response so you can still test the UI, animations, and data rendering without an API key. This is useful for frontend/UX development.
+
+## Bonus Features Included
+
+- ⚡ Loading animations with step progress
+- 🎨 Icon-based UI with Lucide React
+- 🌙 Dark mode optimized
+- ⌨️ Example prompts for quick testing
+- 📊 Execution time and API call count
+- 🎯 Responsive grid layout (desktop/mobile)
