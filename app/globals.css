@@ -3,32 +3,96 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background:                #070d1f;
+  --surface-container-lowest:  #000000;
+  --surface-container-low:     #0c1326;
+  --surface-container:         #11192e;
+  --surface-container-high:    #161e33;
+  --surface-container-highest: #1c253e;
+  --primary:                   #5ffff7;
+  --primary-container:         #06f3eb;
+  --on-primary:                #000000;
+  --on-surface:                #dfe4fe;
+  --on-surface-variant:        #7b87a8;
+  --outline:                   #41475b;
+  --outline-variant:           #2a3050;
+  --secondary-container:       #0c3a38;
+  --on-secondary-container:    #87c3bf;
 }
 
 body {
-  color: var(--foreground);
+  color: var(--on-surface);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-manrope), Manrope, sans-serif;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+/* ── Utilities ─────────────────────────────────────────────────────────────── */
+
+.glow-surface {
+  box-shadow: 0px 0px 40px 0px rgba(95, 255, 247, 0.04);
 }
 
+.primary-gradient {
+  background: linear-gradient(135deg, #5ffff7 0%, #06f3eb 100%);
+}
+
+.primary-gradient-text {
+  background: linear-gradient(135deg, #5ffff7 0%, #06f3eb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Ghost border fallback — outline-variant at 15% opacity */
+.ghost-border {
+  box-shadow: inset 0 0 0 1px rgba(65, 71, 91, 0.15);
+}
+
+/* Left accent bar on focus for input fields */
+.input-focus-accent {
+  position: relative;
+}
+.input-focus-accent::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 20%;
+  height: 60%;
+  width: 2px;
+  background: var(--primary);
+  border-radius: 1px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.input-focus-accent:focus-within::before {
+  opacity: 1;
+}
+
+/* Material Symbols */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scanline animation (for pipeline step card) */
 @keyframes scanline {
   0%   { transform: translateY(-100%); opacity: 0; }
   10%  { opacity: 1; }
   90%  { opacity: 1; }
   100% { transform: translateY(2000%); opacity: 0; }
+}
+
+/* Breathing glow (for active pipeline border) */
+@keyframes breath-glow {
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 0.8; }
 }
