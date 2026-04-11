@@ -4,6 +4,10 @@ An autonomous content pipeline agent that takes a content goal and target platfo
 
 Built for the OxBuild Hackathon.
 
+**Demo video:** https://youtu.be/d3oCRnzpJvM
+**Live demo:** https://taskflow-tawny-omega.vercel.app
+**Registered Oxlo email:** adityakumaryadav74@gmail.com
+
 ---
 
 ## What It Does
