@@ -11,53 +11,6 @@ import PersonalizationSidebar from './components/PersonalizationSidebar';
 
 const PLATFORMS = ['LinkedIn', 'Twitter/X', 'Blog', 'Email'];
 
-const TEMPLATES = [
-  {
-    id: 'thought-leader',
-    name: 'Thought Leader',
-    emoji: '🧠',
-    description: 'Authoritative long-form takes that position you as an expert in your field.',
-    preferences: { tone: 'Authoritative', style: 'Data-driven', audience: 'B2B', customInstructions: 'Open with a bold contrarian claim. Back every point with a stat or real-world example. End with a strong call to action.' },
-    exampleGoal: 'Write a LinkedIn post on why most companies are measuring AI ROI completely wrong',
-    platform: 'LinkedIn',
-  },
-  {
-    id: 'startup-founder',
-    name: 'Startup Founder',
-    emoji: '🚀',
-    description: 'Raw, build-in-public energy. Honest, punchy, and human.',
-    preferences: { tone: 'Casual', style: 'Storytelling', audience: 'Tech Folks', customInstructions: 'Write in first person. Share the behind-the-scenes reality, not the highlight reel. Keep sentences short. Avoid corporate language.' },
-    exampleGoal: 'Write a Twitter thread about what nobody tells you about launching your first product',
-    platform: 'Twitter/X',
-  },
-  {
-    id: 'educator',
-    name: 'The Educator',
-    emoji: '📚',
-    description: 'Clear, structured explainers that make complex topics click for any reader.',
-    preferences: { tone: 'Formal', style: 'Bullet-heavy', audience: 'Students', customInstructions: 'Use simple analogies to explain difficult concepts. Structure with clear headings. Define jargon immediately when used. End with a one-sentence takeaway.' },
-    exampleGoal: 'Write a blog post explaining how large language models work, for someone with no ML background',
-    platform: 'Blog',
-  },
-  {
-    id: 'growth-marketer',
-    name: 'Growth Marketer',
-    emoji: '📈',
-    description: 'Conversion-focused copy that hooks fast and drives action.',
-    preferences: { tone: 'Witty', style: 'Conversational', audience: 'General Public', customInstructions: 'Lead with the pain point, not the product. Use the PAS framework (Problem → Agitate → Solve). Include a single, clear CTA. No filler sentences.' },
-    exampleGoal: 'Write a product launch email for a new AI writing tool targeting small business owners',
-    platform: 'Email',
-  },
-  {
-    id: 'tech-writer',
-    name: 'Tech Writer',
-    emoji: '⚙️',
-    description: 'Precise, developer-friendly content with depth and zero fluff.',
-    preferences: { tone: 'Formal', style: 'Data-driven', audience: 'Tech Folks', customInstructions: 'Use technical terms correctly but always explain them in context. Include concrete code examples or system diagrams where relevant. Prefer active voice. Never oversimplify.' },
-    exampleGoal: 'Write a technical blog post on the architecture tradeoffs between RAG and fine-tuning for production LLM apps',
-    platform: 'Blog',
-  },
-];
 
 const EXAMPLE_GOALS = [
   "Write a LinkedIn post about why Indian startups should adopt AI early",
@@ -313,59 +266,6 @@ function AgentBubble({ result, isCopied, onCopy, onDownload }) {
   );
 }
 
-// ── Templates Dropdown ────────────────────────────────────────────────────────
-
-function TemplatesDropdown({ onApply }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  return (
-    <div ref={ref} className="relative">
-      <button
-        onClick={() => setOpen(v => !v)}
-        className={`font-label text-sm transition-colors ${open ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'}`}
-      >
-        Templates
-      </button>
-
-      {open && (
-        <div className="absolute top-full right-0 mt-3 w-80 bg-surface-container/90 backdrop-blur-2xl rounded-2xl overflow-hidden z-50 shadow-ambient-primary">
-          <div className="px-4 py-3 border-b border-outline-variant/20">
-            <p className="font-headline text-xs font-semibold text-on-surface tracking-tight">Personality Templates</p>
-            <p className="font-label text-[11px] text-on-surface-variant mt-0.5">Click to apply preferences + example goal</p>
-          </div>
-          <div className="flex flex-col">
-            {TEMPLATES.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => { onApply(t); setOpen(false); }}
-                className="flex items-start gap-3 px-4 py-3.5 hover:bg-surface-container-high transition-all text-left group"
-              >
-                <span className="text-xl flex-shrink-0 mt-0.5">{t.emoji}</span>
-                <div className="min-w-0">
-                  <p className="font-headline text-sm font-semibold text-on-surface group-hover:text-primary transition-colors">{t.name}</p>
-                  <p className="font-label text-xs text-on-surface-variant leading-relaxed mt-0.5">{t.description}</p>
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {[t.preferences.tone, t.preferences.style, t.preferences.audience].filter(Boolean).map(tag => (
-                      <span key={tag} className="font-label text-[10px] px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded-full">{tag}</span>
-                    ))}
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ── Settings Button ───────────────────────────────────────────────────────────
 
 function SettingsButton({ onClick, hasPreferences }) {
@@ -395,6 +295,17 @@ export default function Home() {
     try {
       const stored = JSON.parse(localStorage.getItem('taskflow_prefs') || 'null');
       if (stored) setPreferences(stored);
+
+      const pendingGoal = localStorage.getItem('taskflow_pending_goal');
+      const pendingPlatform = localStorage.getItem('taskflow_pending_platform');
+      if (pendingGoal) {
+        dispatch({ type: 'SET_LANDING_GOAL', value: pendingGoal });
+        localStorage.removeItem('taskflow_pending_goal');
+      }
+      if (pendingPlatform) {
+        dispatch({ type: 'SET_LANDING_PLATFORM', value: pendingPlatform });
+        localStorage.removeItem('taskflow_pending_platform');
+      }
     } catch {}
   }, []);
 
@@ -500,12 +411,7 @@ export default function Home() {
               <div className="hidden md:flex items-center gap-8 font-label text-sm">
                 <span className="text-on-surface font-medium cursor-pointer hover:text-primary transition-colors">Dashboard</span>
                 <span className="text-on-surface-variant cursor-pointer hover:text-on-surface transition-colors">History</span>
-                <TemplatesDropdown onApply={(t) => {
-                  setPreferences(t.preferences);
-                  localStorage.setItem('taskflow_prefs', JSON.stringify(t.preferences));
-                  dispatch({ type: 'SET_LANDING_GOAL', value: t.exampleGoal });
-                  dispatch({ type: 'SET_LANDING_PLATFORM', value: t.platform });
-                }} />
+                <Link href="/templates" className="text-on-surface-variant hover:text-on-surface transition-colors">Templates</Link>
               </div>
               <SettingsButton onClick={() => setSidebarOpen(true)} hasPreferences={hasPreferences} />
             </nav>
