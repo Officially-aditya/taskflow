@@ -1,6 +1,7 @@
 {
-  "name": "taskflow-next",
+  "name": "taskflow-ai",
   "version": "0.1.0",
+  "description": "TaskFlow AI - AI-powered task execution system with multi-step structured output",
   "private": true,
   "scripts": {
     "dev": "next dev",
