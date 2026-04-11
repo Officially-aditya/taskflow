@@ -1,108 +1,125 @@
 # TaskFlow AI
 
-An AI-powered task execution system that converts user intent into structured, multi-step actionable outputs using Oxlo AI APIs. 
+An autonomous content pipeline agent that takes a content goal and target platform, runs it through a self-correcting 6-step pipeline with live web research, and delivers a polished, publication-ready output — streamed in real time.
 
-This is NOT a chatbot—it behaves as an intent → planning → execution engine that returns structured, programmatically-consumable outputs.
+Built for the OxBuild Hackathon.
 
-## Problem
-General chat models return unstructured conversation blocks, making it difficult to parse and use outputs programmatically. Chat interfaces don't enforce output schemas.
+---
 
-## Solution
-TaskFlow AI implements a 3-step AI pipeline that:
-1. **Intent Detection** - Classifies user intent and extracts relevant entities
-2. **Task Planning** - Generates logically-ordered intermediate steps
-3. **Structured Output Generation** - Orchestrates execution and returns validated JSON
+## What It Does
 
-This pattern behaves like an agentic system, not a generic chatbot, with deterministic, consumable outputs.
+Give it a goal like _"Write a LinkedIn post about why Indian startups should adopt AI early"_ and a platform. It handles everything else:
+
+1. **Research** — searches the web via Tavily, filters and ranks results, builds a factual grounding block
+2. **Draft** — writes a full first draft grounded in real stats and examples
+3. **Review** — scores the draft out of 10 and returns structured quality metadata
+4. **Rewrite** _(conditional)_ — if score < 7.0, rewrites from scratch using the review notes, then re-scores
+5. **Format** — applies strict platform-specific formatting rules
+6. **Polish** — final grammar, flow, and hook pass before delivery
+
+Every step streams back to the UI in real time. The pipeline is fully autonomous — no human input between steps.
+
+---
 
 ## Architecture
 
 ```
- User Input ("Plan my Saturday")
-     │
-     ▼
-[ Intent Detection ] ──▶ Classifies intent, extracts entities
-     │
-     ▼
-[ Task Planning ]    ──▶ Generates step-by-step execution plan
-     │
-     ▼
-[ Execution ]        ──▶ Orchestrates completion & returns structured JSON
-     │
-     ▼
-Structured Output (Title + Sections) → UI Rendering
+Browser (page.js)
+    │
+    │  POST /api/execute  { goal, platform, preferences, previousOutput?, refinementNote? }
+    ▼
+Route Handler (app/api/execute/route.js)
+    │  ← SSE stream: data: { type: 'step' | 'result' | 'error', ... }
+    │
+    ├── Step 1: searchWeb() → Tavily REST API
+    ├── Step 2: callOxloText() → Draft
+    ├── Step 3: callOxlo() → Review JSON
+    ├── Step 4: callOxloText() → Rewrite (if score < 7.0) + callOxlo() re-review
+    ├── Step 5: callOxloText() → Format
+    └── Step 6: callOxloText() → Polish
+    │
+    └── Final SSE event: { type: 'result', output, score, tone, seo, length, apiCalls, researched }
 ```
 
-## Tech Stack
-- **Next.js 14+** (App Router, Server/Client Components)
-- **React** (Frontend interactivity)
-- **TailwindCSS** (Modern UI styling)
-- **Lucide React** (Icons)
-- **Oxlo AI APIs** (LLM calls for pipeline steps)
+The route handler opens a `TransformStream` and returns the readable end immediately, writing SSE frames as each step completes. The stream is always closed in a `finally` block.
 
-## Setup Instructions
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 14 (App Router) |
+| UI | React, Tailwind CSS, lucide-react |
+| LLM | Oxlo API — model `deepseek-v3-0324` |
+| Web search | Tavily REST API |
+| Streaming | Server-Sent Events via Web Streams API |
+| State | React `useReducer` |
+
+---
+
+## Setup
 
 ### 1. Prerequisites
-- Node.js 18+ 
-- npm or yarn
+- Node.js 18+
 
-### 2. Installation
+### 2. Install
 ```bash
 cd taskflow-next
 npm install
 ```
 
-### 3. Environment Configuration
-```bash
-cp .env.example .env.local
+### 3. Environment
+Create a `.env` file in `taskflow-next/`:
+```
+OXLO_API=your_oxlo_api_key
+TAVILY_API=your_tavily_api_key
 ```
 
-Edit `.env.local` and add your Oxlo API key:
-```
-OXLO_API_KEY=your_oxlo_api_key_here
-```
+Both keys are server-side only — never exposed to the browser.
 
-### 4. Run Development Server
+### 4. Run
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000).
+
+---
 
 ## Features
 
-✅ **3-Step AI Pipeline** - Intent detection, planning, and structured execution  
-✅ **Animated Step Progress** - Real-time UI feedback during execution  
-✅ **Structured Output** - Returns validated JSON with title and sections  
-✅ **Graceful Fallback** - Mock responses if API key missing (for testing UI)  
-✅ **Responsive Design** - Mobile and desktop support  
-✅ **Dark Mode** - Modern dark UI with emerald/cyan accent colors  
-✅ **Example Prompts** - Pre-filled intent examples for quick testing  
+### Core Pipeline
+- 6-step autonomous pipeline streamed via SSE
+- Self-correcting: reviews its own draft, rewrites only if needed (threshold: 7.0/10)
+- Web-grounded: Tavily `advanced` search with score filtering and AI answer summary
+- Research failure is non-fatal — pipeline continues without web context
 
-## API Response Format
+### UI
+- Chat-like interface: landing page slides into a conversation thread on first submit
+- One pipeline step shown at a time with typewriter effect and animated scan line
+- Each run shows step progress, score, tone, SEO rating, length, API call count
+- Follow-up messages refine the previous output (passes `previousOutput` + `refinementNote` into pipeline)
+- Full run history preserved in session via `useReducer`
+- Copy and download buttons on every output
 
-```json
-{
-  "steps": [
-    "Understanding intent...",
-    "Planning tasks...",
-    "Generating output..."
-  ],
-  "result": {
-    "title": "Generated Task Title",
-    "sections": [
-      {
-        "heading": "Section Name",
-        "content": ["point1", "point2", "point3"]
-      }
-    ]
-  },
-  "meta": {
-    "api_calls": 3,
-    "execution_time": "2.15 sec"
-  }
-}
-```
+### Markdown Renderer
+Output is rendered as formatted markdown — headings, bold/italic, inline and fenced code blocks, lists, links, dividers — parsed from scratch with no external library.
+
+### Personalization Sidebar
+A slide-in panel (settings icon, top-right) with two sections:
+
+**Profile** — optional name/email stored in `localStorage` under `taskflow_profile`. Shows a "Logged in as" badge when set.
+
+**Writing Preferences** — four controls:
+- Tone: Formal / Casual / Witty / Authoritative
+- Writing Style: Storytelling / Bullet-heavy / Data-driven / Conversational
+- Audience: B2B / Students / General Public / Tech Folks
+- Custom Instructions: free-text field
+
+Preferences are stored in `localStorage` under `taskflow_prefs` and injected into the Step 2 (draft) and Step 4 (rewrite) system prompts on every run. An amber dot on the settings icon indicates active preferences.
+
+---
 
 ## File Structure
 
@@ -111,48 +128,45 @@ taskflow-next/
 ├── app/
 │   ├── api/
 │   │   └── execute/
-│   │       └── route.js         # POST /api/execute - Main pipeline
-│   ├── layout.tsx              # Root layout
-│   ├── page.js                 # Main UI component
-│   ├── globals.css             # Global styles
-│   └── favicon.ico
+│   │       └── route.js              # 6-step SSE pipeline
+│   ├── components/
+│   │   ├── MarkdownRenderer.js       # Custom markdown renderer
+│   │   └── PersonalizationSidebar.js # Preferences + profile panel
+│   ├── layout.tsx
+│   ├── page.js                       # Full UI + useReducer state machine
+│   └── globals.css
 ├── lib/
-│   └── oxlo.js                 # Oxlo API integration
-├── public/                     # Static assets
-├── .env.example               # Environment template
-├── .env.local                 # Your secrets (not in git)
-├── package.json               # Dependencies
-├── tailwind.config.ts         # Tailwind theming
-├── next.config.mjs            # Next.js config
-└── README.md                  # This file
+│   ├── oxlo.js                       # callOxlo() + callOxloText()
+│   └── tavily.js                     # searchWeb()
+├── .env                              # OXLO_API + TAVILY_API
+├── taskflow.md                       # Full technical documentation
+└── README.md
 ```
 
-## Usage Examples
+---
 
-### Plan my Saturday
-Input: "Plan my Saturday with outdoor activities"
+## SSE Event Reference
 
-Returns: Structured plan with morning, afternoon, evening activities
+```js
+// Step update (emitted at start and end of each step)
+{ type: 'step', step: 1-6, label: string, status: 'running'|'done'|'skipped', score?: number }
 
-### Learn Golang
-Input: "Learn Golang in 30 days syllabus"
+// Final result
+{ type: 'result', output: string, score: number, tone: string, seo: string, length: string, platform: string, apiCalls: number, researched: boolean }
 
-Returns: Week-by-week learning path with concepts and projects
+// Error
+{ type: 'error', message: string }
+```
 
-### YouTube Channel
-Input: "Start a YouTube channel step-by-step"
+---
 
-Returns: Pre-production, equipment setup, content creation roadmap
+## API Call Budget
 
-## Fallback Behavior
+| Condition | LLM calls | Tavily calls |
+|---|---|---|
+| Normal run, score ≥ 7 | 4 | 1 |
+| Normal run, score < 7 | 6 | 1 |
+| Refinement, score ≥ 7 | 4 | 0 |
+| Refinement, score < 7 | 6 | 0 |
 
-If `OXLO_API_KEY` is not set in `.env.local`, the API gracefully returns a mock response so you can still test the UI, animations, and data rendering without an API key. This is useful for frontend/UX development.
-
-## Bonus Features Included
-
-- ⚡ Loading animations with step progress
-- 🎨 Icon-based UI with Lucide React
-- 🌙 Dark mode optimized
-- ⌨️ Example prompts for quick testing
-- 📊 Execution time and API call count
-- 🎯 Responsive grid layout (desktop/mobile)
+For full technical detail on every step, prompt, and data shape see [taskflow.md](taskflow.md).
