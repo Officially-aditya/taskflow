@@ -486,7 +486,7 @@ export default function Home() {
                     onClick={() => dispatch({ type: 'SET_LANDING_GOAL', value: text })}
                     className="w-full py-3.5 px-6 rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface-variant hover:text-on-surface text-left transition-all flex justify-between items-center group"
                   >
-                    <span className="font-body text-sm italic">"{text}"</span>
+                    <span className="font-body text-sm italic">&ldquo;{text}&rdquo;</span>
                     <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-primary flex-shrink-0 ml-4" />
                   </button>
                 ))}

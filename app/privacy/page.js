@@ -27,7 +27,7 @@ export default function Privacy() {
           <section>
             <h2 className="font-headline text-base font-semibold text-on-surface mb-3">What We Collect</h2>
             <p className="text-on-surface-variant leading-relaxed text-sm">
-              TaskFlow AI stores your writing preferences (tone, style, audience, custom instructions) and optional profile information (name, email) exclusively in your browser's <code className="font-mono text-xs bg-surface-container-highest px-1.5 py-0.5 rounded text-primary">localStorage</code>. No data is transmitted to or stored on our servers. Your content goals and generated outputs exist only in your browser session and are discarded when you close the tab.
+              TaskFlow AI stores your writing preferences (tone, style, audience, custom instructions) and optional profile information (name, email) exclusively in your browser&apos;s <code className="font-mono text-xs bg-surface-container-highest px-1.5 py-0.5 rounded text-primary">localStorage</code>. No data is transmitted to or stored on our servers. Your content goals and generated outputs exist only in your browser session and are discarded when you close the tab.
             </p>
           </section>
 
@@ -48,7 +48,7 @@ export default function Privacy() {
           <section>
             <h2 className="font-headline text-base font-semibold text-on-surface mb-3">Data Deletion</h2>
             <p className="text-on-surface-variant leading-relaxed text-sm">
-              To remove all stored data, open your browser's developer tools, navigate to Application → Local Storage, and delete the keys <code className="font-mono text-xs bg-surface-container-highest px-1.5 py-0.5 rounded text-primary">taskflow_prefs</code> and <code className="font-mono text-xs bg-surface-container-highest px-1.5 py-0.5 rounded text-primary">taskflow_profile</code>. Alternatively, use the "Clear" option in the personalization sidebar.
+              To remove all stored data, open your browser&apos;s developer tools, navigate to Application → Local Storage, and delete the keys <code className="font-mono text-xs bg-surface-container-highest px-1.5 py-0.5 rounded text-primary">taskflow_prefs</code> and <code className="font-mono text-xs bg-surface-container-highest px-1.5 py-0.5 rounded text-primary">taskflow_profile</code>. Alternatively, use the &ldquo;Clear&rdquo; option in the personalization sidebar.
             </p>
           </section>
 

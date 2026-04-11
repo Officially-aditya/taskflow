@@ -48,7 +48,7 @@ export default function Support() {
         <p className="font-label text-xs uppercase tracking-[0.3em] text-outline mb-4">Help</p>
         <h1 className="font-headline text-3xl font-bold tracking-tight text-on-surface mb-2">Support</h1>
         <p className="text-on-surface-variant text-sm mb-12 leading-relaxed max-w-lg">
-          Answers to common questions about the pipeline, preferences, and data. Can't find what you need? Use the contact form below.
+          Answers to common questions about the pipeline, preferences, and data. Can&apos;t find what you need? Use the contact form below.
         </p>
 
         {/* FAQ */}
@@ -64,7 +64,7 @@ export default function Support() {
         {/* Contact */}
         <div className="bg-surface-container-low rounded-2xl p-6 md:p-8">
           <h2 className="font-headline text-base font-semibold text-on-surface mb-1">Still need help?</h2>
-          <p className="text-on-surface-variant text-sm mb-6">Send us a message and we'll get back to you.</p>
+          <p className="text-on-surface-variant text-sm mb-6">Send us a message and we&apos;ll get back to you.</p>
           <div className="flex flex-col gap-3">
             <input
               type="text"

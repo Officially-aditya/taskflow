@@ -55,7 +55,7 @@ export default function Terms() {
           <section>
             <h2 className="font-headline text-base font-semibold text-on-surface mb-3">Limitation of Liability</h2>
             <p className="text-on-surface-variant leading-relaxed text-sm">
-              TaskFlow AI is provided "as is" without warranty of any kind. We are not liable for any direct, indirect, incidental, or consequential damages arising from your use of the platform or any content it generates.
+              TaskFlow AI is provided &ldquo;as is&rdquo; without warranty of any kind. We are not liable for any direct, indirect, incidental, or consequential damages arising from your use of the platform or any content it generates.
             </p>
           </section>
 

@@ -76,7 +76,7 @@ export default function Templates() {
               {/* Example goal */}
               <div className="flex-1 min-w-0">
                 <p className="font-label text-[10px] uppercase tracking-widest text-outline mb-1">Example goal</p>
-                <p className="font-body text-sm text-on-surface-variant italic leading-relaxed truncate">"{t.exampleGoal}"</p>
+                <p className="font-body text-sm text-on-surface-variant italic leading-relaxed truncate">&ldquo;{t.exampleGoal}&rdquo;</p>
               </div>
 
               {/* Platform + CTA */}
