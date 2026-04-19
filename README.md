@@ -7,6 +7,7 @@ Built for the OxBuild Hackathon.
 **Demo video:** https://youtu.be/d3oCRnzpJvM
 **Live demo:** https://taskflow-tawny-omega.vercel.app
 **Registered Oxlo email:** adityakumaryadav74@gmail.com
+**Model:** deepseek-v3-0324 via Oxlo API
 
 ---
 
